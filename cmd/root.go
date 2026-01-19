@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime/debug"
 
 	"github.com/alligator/gdqgo/internal/persist"
 	"github.com/alligator/gdqgo/internal/statsfile"
@@ -13,8 +14,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "gdqgo",
-	Short: "A brief description of your application",
-	Long:  ``,
+	Short: "gdqgo",
+	Long:  "", // set in init()
 }
 
 var configCmd = &cobra.Command{
@@ -85,8 +86,20 @@ func Execute() {
 	}
 }
 
+func getCommit() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				return setting.Value[:7]
+			}
+		}
+	}
+	return "dev"
+}
+
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	rootCmd.Long = fmt.Sprintf("gdqgo (%s)\na thing by alligator", getCommit())
 
 	rootCmd.AddCommand(configCmd)
 	configCmd.Flags().BoolP("edit", "e", false, "edit the config file")
