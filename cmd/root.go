@@ -74,11 +74,6 @@ var testParseCmd = &cobra.Command{
 		fmt.Printf("  viewers: %d\n", len(sf.Viewers))
 		fmt.Printf("  viewers[0]: %s\n", firstviewers)
 
-		err = statsfile.Write("output.json", sf)
-		if err != nil {
-			return err
-		}
-
 		return nil
 	},
 }
