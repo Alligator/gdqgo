@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Game struct {
@@ -25,6 +26,7 @@ type StatsFile struct {
 	MarathonType string   `json:"marathon_type"`
 	Viewers      []Viewer `json:"viewers"`
 	Games        []Game   `json:"games"`
+	Filename     string
 }
 
 func New(name string, typ string) StatsFile {
@@ -47,6 +49,7 @@ func Read(path string) (StatsFile, error) {
 		return StatsFile{}, err
 	}
 
+	sf.Filename = filepath.Base(path)
 	return sf, nil
 }
 
