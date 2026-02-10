@@ -159,4 +159,5 @@ func init() {
 	fetchCmd.MarkFlagRequired("type")
 	fetchCmd.MarkFlagRequired("tracker-marathon-id")
 	fetchCmd.MarkFlagRequired("twitch-user-id")
+	fetchCmd.MarkFlagRequired("youtube-channel-id")
 }
