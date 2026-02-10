@@ -19,6 +19,7 @@ type fetchOpts struct {
 	typ                string
 	trackerMararthonId int
 	twitchUserId       int
+	youtubeChannelId   string
 	step               string
 }
 
@@ -69,7 +70,8 @@ var fetchCmd = &cobra.Command{
 		})
 
 		v := statsfile.Viewer{}
-		v.Time = float64(time.Now().UnixMilli()) / 1000
+		now := time.Now().UTC()
+		v.Time = float64(now.UnixMilli()) / 1000
 
 		step("fetch donations", func() error {
 			donations, err := tracker.GetDonations(fo.trackerMararthonId)
@@ -91,11 +93,14 @@ var fetchCmd = &cobra.Command{
 		})
 
 		step("fetch youtube viewers", func() error {
-			viewers, err := youtube.GetViewers("f17J3AXVK5w")
+			viewers, err := youtube.GetViewers(fo.youtubeChannelId)
 			if err != nil {
 				return err
 			}
-			i64 := int64(viewers)
+			i64 := int64(0)
+			if viewers.Live {
+				i64 = int64(viewers.Viewers)
+			}
 			v.YoutubeViewers = &i64
 			return nil
 		})
@@ -147,6 +152,7 @@ func init() {
 	fetchCmd.Flags().Func("type", "one of 'gdq', 'gdqx', 'ff', 'btb' or 'gdqueer'", typeFlag)
 	fetchCmd.Flags().IntVar(&fo.trackerMararthonId, "tracker-marathon-id", 0, "tracker marathon id")
 	fetchCmd.Flags().IntVar(&fo.twitchUserId, "twitch-user-id", 0, "twitch user id")
+	fetchCmd.Flags().StringVar(&fo.youtubeChannelId, "youtube-channel-id", "", "youtube channel id")
 	fetchCmd.Flags().StringVar(&fo.step, "step", "", "only run this step")
 
 	fetchCmd.MarkFlagRequired("name")

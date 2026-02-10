@@ -92,7 +92,7 @@ func ReadFiles(globs []string) ([]statsfile.StatsFile, error) {
 		return statsfiles, fmt.Errorf("no files found!")
 	}
 
-	orderIndex := []string{"agdq", "sgdq", "frost", "flame", "gdqx"}
+	orderIndex := []string{"agdq", "sgdq", "frost", "flame", "gdqx", "btb"}
 	sortRe := regexp.MustCompile(`([a-z]+)(\d\d)`)
 	slices.SortFunc(files, func(a string, b string) int {
 		am := sortRe.FindStringSubmatch(filepath.Base(a))
@@ -162,11 +162,11 @@ func GenerateCompFile(marathons []statsfile.StatsFile) (compFile, error) {
 		Name:         co.name,
 		Marathons:    marathonNames,
 		Ts:           timestamps,
-		Viewers:      make([][]*int64, 0),
-		ViewersYt:    make([][]*int64, 0),
-		Donations:    make([][]*float64, 0),
-		DonationPace: make([][]*donationPace, 0),
-		Meta:         make([]meta, 0),
+		Viewers:      make([][]*int64, 0, len(marathons)),
+		ViewersYt:    make([][]*int64, 0, len(marathons)),
+		Donations:    make([][]*float64, 0, len(marathons)),
+		DonationPace: make([][]*donationPace, 0, len(marathons)),
+		Meta:         make([]meta, 0, len(marathons)),
 	}
 
 	for _, marathon := range marathons {
