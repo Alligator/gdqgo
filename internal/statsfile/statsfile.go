@@ -60,7 +60,7 @@ func Write(path string, sf StatsFile) error {
 	}
 
 	tmpPath := path + ".tnp"
-	if err := os.WriteFile(tmpPath, b, 0o700); err != nil {
+	if err := os.WriteFile(tmpPath, b, 0o664); err != nil {
 		return err
 	}
 
