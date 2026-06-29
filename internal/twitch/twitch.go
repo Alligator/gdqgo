@@ -82,22 +82,38 @@ func GetViewers(userId int) (int, error) {
 
 	client := http.Client{}
 
-	url := fmt.Sprintf("https://api.twitch.tv/helix/streams?user_id=%d", userId)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return 0, err
+	var resp *http.Response
+
+	for range 2 {
+		url := fmt.Sprintf("https://api.twitch.tv/helix/streams?user_id=%d", userId)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return 0, err
+		}
+
+		req.Header.Add("Client-ID", clientId)
+		req.Header.Add("Authorization", "Bearer "+twitchToken)
+
+		resp, err = client.Do(req)
+		if err != nil {
+			return 0, err
+		}
+
+		if resp.StatusCode == http.StatusUnauthorized {
+			twitchToken, err = getTwitchAccessToken()
+			if err != nil {
+				return 0, err
+			}
+			persist.Set("twitch_token", twitchToken)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return 0, fmt.Errorf("twitch returned HTTP %s", resp.Status)
+		}
 	}
 
-	req.Header.Add("Client-ID", clientId)
-	req.Header.Add("Authorization", "Bearer "+twitchToken)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return 0, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("twitch returned HTTP %s", resp.Status)
+	if resp == nil {
+		return 0, fmt.Errorf("failed after 2 retries")
 	}
 
 	var s streams

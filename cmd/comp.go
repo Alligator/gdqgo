@@ -64,7 +64,8 @@ var compCmd = &cobra.Command{
 		}
 
 		outputFile := args[0]
-		b, err := json.MarshalIndent(cf, "", "  ")
+		// b, err := json.MarshalIndent(cf, "", "  ")
+		b, err := json.Marshal(cf)
 		if err != nil {
 			return err
 		}
