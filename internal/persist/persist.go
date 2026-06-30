@@ -84,6 +84,7 @@ func Set(key string, value string) error {
 	}
 
 	mu.Lock()
+	defer mu.Unlock()
 	store[key] = value
 	b, err := json.MarshalIndent(store, "", "  ")
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alligator/gdqgo/internal/logger"
 	"github.com/alligator/gdqgo/internal/statsfile"
 	"github.com/spf13/cobra"
 )
@@ -112,7 +113,7 @@ func ReadFiles(globs []string) ([]statsfile.StatsFile, error) {
 			break
 		}
 
-		fmt.Printf("reading %s\n", f)
+		logger.Debugf("comp", "reading %s", f)
 		sf, err := statsfile.Read(f)
 		if err != nil {
 			return statsfiles, fmt.Errorf("error reading %s %w", f, err)

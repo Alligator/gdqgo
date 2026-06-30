@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"runtime/debug"
 
+	"github.com/alligator/gdqgo/internal/logger"
 	"github.com/alligator/gdqgo/internal/persist"
 	"github.com/alligator/gdqgo/internal/statsfile"
 	"github.com/spf13/cobra"
@@ -105,4 +106,6 @@ func init() {
 	configCmd.Flags().BoolP("edit", "e", false, "edit the config file")
 
 	rootCmd.AddCommand(testParseCmd)
+
+	rootCmd.PersistentFlags().BoolVarP(&logger.Verbose, "verbose", "v", false, "enable verbose logs")
 }

@@ -3,12 +3,12 @@ package fetch
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"runtime/debug"
 	"strings"
 	"time"
 
+	"github.com/alligator/gdqgo/internal/logger"
 	"github.com/alligator/gdqgo/internal/statsfile"
 	"github.com/alligator/gdqgo/internal/tracker"
 	"github.com/alligator/gdqgo/internal/twitch"
@@ -45,14 +45,15 @@ func (f *Fetcher) step(name string, fn func() error) {
 	}
 
 	start := time.Now()
+	logger.Debugf("fetch", "[%s] starting", name)
 
 	if err := fn(); err != nil {
 		f.errs = append(f.errs, fmt.Errorf("[%s] ERROR: %w", name, err))
-		log.Printf("[%s] ERROR: %s\n", name, err)
+		logger.Logf("fetch", "[%s] ERROR: %s", name, err)
 	}
 
 	d := time.Since(start).Round(time.Millisecond)
-	log.Printf("[%s] took %s\n", name, d)
+	logger.Debugf("fetch", "[%s] took %s", name, d)
 }
 
 func (f *Fetcher) DoFetch(file string) error {
@@ -71,6 +72,7 @@ func (f *Fetcher) DoFetch(file string) error {
 		if err != nil {
 			return err
 		}
+		logger.Debugf("fetch", "fetched schedule")
 		games := make([]statsfile.Game, 0, len(schedule))
 		for _, g := range schedule {
 			runners := make([]string, 0)
@@ -86,6 +88,7 @@ func (f *Fetcher) DoFetch(file string) error {
 			})
 		}
 
+		logger.Debugf("fetch", "fetched %d games", len(games))
 		sf.Games = games
 		return nil
 	})
@@ -99,6 +102,7 @@ func (f *Fetcher) DoFetch(file string) error {
 		if err != nil {
 			return err
 		}
+		logger.Debugf("fetch", "fetched donation total")
 		v.DonationTotal = &donations
 		return nil
 	})
@@ -108,6 +112,7 @@ func (f *Fetcher) DoFetch(file string) error {
 		if err != nil {
 			return err
 		}
+		logger.Debugf("fetch", "fetched twitch viewers")
 		i64 := int64(viewers)
 		v.TwitchViewers = &i64
 		return nil
@@ -118,6 +123,7 @@ func (f *Fetcher) DoFetch(file string) error {
 		if err != nil {
 			return err
 		}
+		logger.Debugf("fetch", "fetched youtube viewers")
 		i64 := int64(0)
 		if viewers.Live {
 			i64 = int64(viewers.Viewers)
