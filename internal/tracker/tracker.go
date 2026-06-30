@@ -17,10 +17,38 @@ type Run struct {
 	Category  string
 	Runners   []Runner
 	StartTime time.Time `json:"starttime"`
+	EndTime   time.Time `json:"endtime"`
 }
 
 type Runs struct {
 	Results []Run
+}
+
+type Event struct {
+	Id       int
+	Name     string
+	Short    string
+	DateTime time.Time
+}
+
+type Events struct {
+	Results []Event
+}
+
+func GetEvents() ([]Event, error) {
+	url := "https://tracker.gamesdonequick.com/tracker/api/v2/events/"
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	var result Events
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Results, nil
 }
 
 func GetSchedule(trackerMarathonId int) ([]Run, error) {
