@@ -3,9 +3,11 @@ package twitch
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
+	"github.com/alligator/gdqgo/internal/logger"
 	"github.com/alligator/gdqgo/internal/persist"
 )
 
@@ -49,7 +51,11 @@ func getTwitchAccessToken() (string, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("twitch returned HTTP %s", resp.Status)
+		b, err := io.ReadAll(resp.Body)
+		if err == nil {
+			logger.Debugf("twitch", "token response: %s", string(b))
+		}
+		return "", fmt.Errorf("twitch returned HTTP %s while getting new token", resp.Status)
 	}
 
 	var token tokenResponse
@@ -100,6 +106,7 @@ func GetViewers(userId int) (int, error) {
 		}
 
 		if resp.StatusCode == http.StatusUnauthorized {
+			logger.Debugf("twitch", "got 401 fetching viewers, getting new token")
 			twitchToken, err = getTwitchAccessToken()
 			if err != nil {
 				return 0, err
