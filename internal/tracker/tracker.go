@@ -12,7 +12,7 @@ type Runner struct {
 }
 
 type Run struct {
-	Name      string `json:"display_name"`
+	Name      string `json:"name"`
 	RunType   string `json:"type"`
 	Category  string
 	Runners   []Runner
