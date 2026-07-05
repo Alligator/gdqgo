@@ -26,7 +26,7 @@ type StatsFile struct {
 	MarathonType string   `json:"marathon_type"`
 	Viewers      []Viewer `json:"viewers"`
 	Games        []Game   `json:"games"`
-	Filename     string
+	Filename     string   `json:"-"`
 }
 
 func New(name string, typ string) StatsFile {
