@@ -13,6 +13,7 @@ var fo fetch.FetchOpts
 var (
 	startTime time.Time
 	endTime   time.Time
+	force     bool
 )
 
 var fetchCmd = &cobra.Command{
@@ -22,17 +23,18 @@ var fetchCmd = &cobra.Command{
 	Args:         cobra.ExactArgs(1),
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		now := time.Now()
-		if !startTime.IsZero() && now.Before(startTime) {
-			return nil
-		}
-		if !endTime.IsZero() && now.After(endTime) {
-			return nil
+		if !force {
+			now := time.Now()
+			if !startTime.IsZero() && now.Before(startTime) {
+				return nil
+			}
+			if !endTime.IsZero() && now.After(endTime) {
+				return nil
+			}
 		}
 
 		f := fetch.NewFetcher(fo)
 		return f.DoFetch(args[0])
-		return nil
 	},
 }
 
@@ -57,6 +59,7 @@ func init() {
 	fetchCmd.Flags().StringVar(&fo.Step, "step", "", "only run this step")
 	fetchCmd.Flags().TimeVar(&startTime, "start", time.Time{}, []string{time.RFC3339}, "time to start fetching")
 	fetchCmd.Flags().TimeVar(&endTime, "end", time.Time{}, []string{time.RFC3339}, "time to stop fetching")
+	fetchCmd.Flags().BoolVar(&force, "force", false, "ignore start and end times")
 
 	fetchCmd.MarkFlagRequired("name")
 	fetchCmd.MarkFlagRequired("type")
