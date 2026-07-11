@@ -206,7 +206,15 @@ func GenerateCompFile(marathons []statsfile.StatsFile) (compFile, error) {
 			setMax(&viewersYt[index], v.YoutubeViewers)
 			setMax(&donations[index], v.DonationTotal)
 
-			if setMaxP(&meta.MaxViewers, v.TwitchViewers) {
+			var totalViewers int64 = 0
+			if v.TwitchViewers != nil {
+				totalViewers += *v.TwitchViewers
+			}
+			if v.YoutubeViewers != nil {
+				totalViewers += *v.YoutubeViewers
+			}
+
+			if setMaxP(&meta.MaxViewers, &totalViewers) {
 				meta.MaxViewersTs = v.Time
 			}
 			setMaxP(&meta.MaxDonations, v.DonationTotal)
